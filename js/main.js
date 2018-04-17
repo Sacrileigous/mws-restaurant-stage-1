@@ -124,10 +124,18 @@ resetRestaurants = (restaurants) => {
  */
 fillRestaurantsHTML = (restaurants = self.restaurants) => {
   const ul = document.getElementById('restaurants-list');
-  restaurants.forEach(restaurant => {
-    ul.append(createRestaurantHTML(restaurant));
-  });
-  addMarkersToMap();
+  if (restaurants.length) {
+    restaurants.forEach(restaurant => {
+      ul.append(createRestaurantHTML(restaurant));
+    });
+    addMarkersToMap();
+  } else {
+    const li = document.createElement('li');
+    const message = document.createElement('p');
+    message.innerHTML = 'Sorry, we could\'nt find any restaurants based on your filter criteria.';
+    li.append(message);
+    ul.append(li);
+  }
 };
 
 /**

@@ -163,6 +163,11 @@ nav h1 a {
   padding: 15px;
   text-align: left;
 }
+#restaurants-list li:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+  padding-bottom: 0;
+}
 #restaurants-list .restaurant-img {
   background-color: #ccc;
   display: block;
