@@ -53,6 +53,7 @@ article, aside, canvas, details, figcaption, figure, footer, header, hgroup, men
   display: block;
 }
 
+/* from https://gist.github.com/marcol/3979586 */
 .visually-hidden {
 	position: absolute !important;
 	clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
