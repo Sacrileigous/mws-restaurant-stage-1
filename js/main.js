@@ -2,6 +2,14 @@ let restaurants, neighborhoods, cuisines;
 var map;
 var markers = [];
 
+if (navigator.serviceWorker && !navigator.serviceWorker.controller) {
+  navigator.serviceWorker.register('sw.js', {
+    scope: './'
+  }).then(function(reg) {
+    console.log('Service worker has been registered for scope: ' + reg.scope);
+  });
+}
+
 /**
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
