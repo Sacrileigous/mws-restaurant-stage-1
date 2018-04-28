@@ -1,4 +1,4 @@
-let restaurants, neighborhoods, cuisines;
+let restaurants, neighborhoods, cuisines, osberver;
 var map;
 var markers = [];
 
@@ -10,6 +10,22 @@ if (navigator.serviceWorker) {
     scope: './'
   }).then(function(reg) {
     console.log('Service worker has been registered for scope: ' + reg.scope);
+  });
+}
+
+/**
+ * Initialize observer for image lazy load.
+ */
+if ('IntersectionObserver' in window) {
+  observer = new IntersectionObserver(function(images) {
+    images.forEach(image => {
+      if (image.intersectionRatio > 0) {
+        observer.unobserve(image.target);
+        image.target.src = image.target.dataset.src;
+      }
+    });
+  }, {
+    rootMargin: '10px 0px'
   });
 }
 
@@ -158,13 +174,23 @@ fillRestaurantsHTML = (restaurants = self.restaurants) => {
 createRestaurantHTML = (restaurant) => {
   const li = document.createElement('li');
 
+  const image = document.createElement('img');
+  image.className = 'restaurant-img';
+  image.src = '/img/placeholder.png';
   if (restaurant.photograph) {
-    const image = document.createElement('img');
-    image.className = 'restaurant-img';
-    image.src = DBHelper.imageUrlForRestaurant(restaurant);
-    image.alt = restaurant.name;
-    li.append(image);
+    if (observer) {
+      image.dataset.src = DBHelper.imageUrlForRestaurant(restaurant);
+      observer.observe(image);
+    } else {
+      image.src = DBHelper.imageUrlForRestaurant(restaurant);
+    }
   }
+  image.alt = restaurant.name;
+
+  const imageWrapper = document.createElement('div');
+  imageWrapper.className = 'restaurant-img-wrapper';
+  imageWrapper.append(image);
+  li.append(imageWrapper);
 
   const name = document.createElement('h3');
   name.innerHTML = restaurant.name;
@@ -183,7 +209,7 @@ createRestaurantHTML = (restaurant) => {
   more.href = DBHelper.urlForRestaurant(restaurant);
   li.append(more);
 
-  return li
+  return li;
 };
 
 /**
@@ -194,7 +220,7 @@ addMarkersToMap = (restaurants = self.restaurants) => {
     // Add marker to the map
     const marker = DBHelper.mapMarkerForRestaurant(restaurant, self.map);
     google.maps.event.addListener(marker, 'click', () => {
-      window.location.href = marker.url
+      window.location.href = marker.url;
     });
     self.markers.push(marker);
   });

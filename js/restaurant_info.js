@@ -1,4 +1,4 @@
-let restaurant;
+let restaurant, osberver;
 var map;
 
 /**
@@ -9,6 +9,22 @@ if (navigator.serviceWorker) {
     scope: './'
   }).then(function(reg) {
     console.log('Service worker has been registered for scope: ' + reg.scope);
+  });
+}
+
+/**
+ * Initialize observer for image lazy load.
+ */
+if ('IntersectionObserver' in window) {
+  observer = new IntersectionObserver(function(images) {
+    images.forEach(image => {
+      if (image.intersectionRatio > 0) {
+        observer.unobserve(image.target);
+        image.target.src = image.target.dataset.src;
+      }
+    });
+  }, {
+    rootMargin: '10px 0px'
   });
 }
 
@@ -69,12 +85,18 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
+  const image = document.getElementById('restaurant-img');
+  image.className = 'restaurant-img';
+  image.src = '/img/placeholder.png';
   if (restaurant.photograph) {
-    const image = document.getElementById('restaurant-img');
-    image.className = 'restaurant-img';
-    image.src = DBHelper.imageUrlForRestaurant(restaurant);
-    image.alt = restaurant.name;
+    if (observer) {
+      image.dataset.src = DBHelper.imageUrlForRestaurant(restaurant);
+      observer.observe(image);
+    } else {
+      image.src = DBHelper.imageUrlForRestaurant(restaurant);
+    }
   }
+  image.alt = restaurant.name;
 
   const cuisine = document.getElementById('restaurant-cuisine');
   cuisine.innerHTML = restaurant.cuisine_type;
