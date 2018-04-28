@@ -1,7 +1,10 @@
 let restaurant;
 var map;
 
-if (navigator.serviceWorker && !navigator.serviceWorker.controller) {
+/**
+ * Register service worker.
+ */
+if (navigator.serviceWorker) {
   navigator.serviceWorker.register('sw.js', {
     scope: './'
   }).then(function(reg) {
@@ -66,7 +69,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   const address = document.getElementById('restaurant-address');
   address.innerHTML = restaurant.address;
 
-  if (restaurant.phorograph) {
+  if (restaurant.photograph) {
     const image = document.getElementById('restaurant-img');
     image.className = 'restaurant-img';
     image.src = DBHelper.imageUrlForRestaurant(restaurant);

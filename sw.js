@@ -1,51 +1,47 @@
-const cacheName = 'pwa-1';
+var staticCacheName = 'restaurant-static-v5';
 
 self.addEventListener('install', function(event) {
-    event.waitUntil(preLoad());
+  event.waitUntil(
+    caches.open(staticCacheName).then(function(cache) {
+      return cache.addAll([
+        '/index.html',
+      ]);
+    })
+  );
 });
 
-function preLoad() {
-    console.log('SW: installing');
-    return caches.open(cacheName).then(function(cache) {
-        console.log('SW: Cached index page during installation');
-        return cache.addAll(['/index.html']);
-    });
-}
-  
-self.addEventListener('fetch', function(event) {
-    event.respondWith(checkResponse(event.request).catch(function() {
-        return returnFromCache(event.request)
-    }));
-    event.waitUntil(addToCache(event.request));
+self.addEventListener('activate', function(event) {
+  event.waitUntil(
+    caches.keys().then(function(cacheNames) {
+      return Promise.all(
+        cacheNames.filter(function(cacheName) {
+          return cacheName.startsWith('restaurant-') &&
+                 !staticCacheName.includes(cacheName);
+        }).map(function(cacheName) {
+          return caches.delete(cacheName);
+        })
+      );
+    })
+  );
 });
-  
-function checkResponse(request) {
-    return new Promise(function(fulfill, reject) {
-        fetch(request).then(function(response) {
-            if (response.status !== 404) {
-                fulfill(response);
-            } else {
-                reject();
-            }
-        }, reject);
-    });
-};
-  
-function addToCache(request) {
-    return caches.open(cacheName).then(function (cache) {
-        return fetch(request).then(function (response) {
-            console.log('SW: added cache' + response.url);
-            return cache.put(request, response);
+
+self.addEventListener('fetch', function(event) {
+  event.respondWith(
+    caches.open(staticCacheName).then(function(cache) {
+      return cache.match(event.request.url).then(function(response) {
+        if (response) return response;
+
+        return fetch(event.request).then(function(networkResponse) {
+          cache.put(event.request.url, networkResponse.clone());
+          return networkResponse;
         });
-    });
-};
-  
-function returnFromCache(request) {
-    return caches.open(cacheName).then(function (cache) {
-        return cache.match(request).then(function (matching) {
-            if (matching && matching.status !== 404) {
-                return matching;
-            }
-        });
-    });
-};
+      });
+    })
+  );
+});
+
+self.addEventListener('message', function(event) {
+  if (event.data.action === 'skipWaiting') {
+    self.skipWaiting();
+  }
+});

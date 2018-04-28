@@ -1,3 +1,22 @@
+let db;
+const dbId = 'restaurant-reviews';
+
+function openDatabase() {
+  if (!db) {
+    if (!navigator.serviceWorker) {
+      return Promise.resolve();
+    }
+
+    return idb.open(dbId, 1, function(upgradeDb) {
+      var store = upgradeDb.createObjectStore(dbId, {
+        keyPath: 'id'
+      });
+      store.createIndex('by-id', 'id');
+    });
+  }
+  return db;
+}
+
 /**
  * Common database helper functions.
  */
@@ -17,20 +36,61 @@ class DBHelper {
    */
   static fetchRestaurants() {
     return new Promise((resolve, reject) => {
-      fetch(DBHelper.DATABASE_URL)
-      .then((response) => {
-        if (response.status === 200) {
-          resolve(response.json());
-        } else {
-          response.text()
-          .then((message) => {
-            reject(message);
+      // First we check idb for restaurants.
+      openDatabase().then((db) => {
+        // Act only if it's possible to open idb.
+        if (db) {
+          var index = db.transaction(dbId)
+            .objectStore(dbId).index('by-id');
+
+          return index.getAll().then(function(restaurants) {
+            // If idb is empty we fallback to fetch request.
+            if (!restaurants.length) {
+              return false;
+            }
+            return restaurants;
           });
         }
-      })
-      .catch((e) => {
-          const error = (`Request failed. ${e.message}`);
-          reject(error);
+        return false;
+      }).then((restaurants) => {
+        if (restaurants) {
+          // Resolve with data from idb.
+          console.info('Fetched all restaurants: retreived from idb.');
+          resolve(restaurants);
+        } else {
+          // If no restaurants are received from idb, we make a request.
+          fetch(DBHelper.DATABASE_URL)
+          .then((response) => {
+            if (response.status === 200) {
+              const jsonResponse = response.json();
+              // Received restaurant info, lets store it in idb.
+              openDatabase().then(function(db) {
+                // Again, only if it's possible to open idb.
+                if (!db) return;
+                jsonResponse.then((restaurants) => {
+                  const tx = db.transaction(dbId, 'readwrite');
+                  const store = tx.objectStore(dbId);
+                  restaurants.forEach(function(restaurant) {
+                    store.put(restaurant);
+                  });
+                });
+              });
+              console.info('Fetched all restaurants: retreived via fetch.');
+              resolve(jsonResponse);
+            } else {
+              // Error during fetch.
+              response.text()
+              .then((message) => {
+                reject(message);
+              });
+            }
+          })
+          .catch((e) => {
+            // Error during fetch.
+            const error = (`Request failed. ${e.message}`);
+            reject(error);
+          });
+        }
       });
     });
   }
@@ -40,20 +100,56 @@ class DBHelper {
    */
   static fetchRestaurantById(id) {
     return new Promise((resolve, reject) => {
-      fetch(`${DBHelper.DATABASE_URL}/${id}`)
-      .then((response) => {
-        if (response.status === 200) {
-          resolve(response.json());
-        } else {
-          response.text()
-          .then((message) => {
-            reject(message);
+      // First we check idb for the restaurant.
+      openDatabase().then((db) => {
+        // Act only if it's possible to open idb.
+        if (db) {
+          var index = db.transaction(dbId)
+            .objectStore(dbId).index('by-id');
+
+          return index.getAll().then(function(restaurants) {
+            const restaurant = restaurants.filter(r => r.id == id);
+            return restaurant.length ? restaurant[0] : false;
           });
         }
-      })
-      .catch((e) => {
-          const error = (`Request failed. ${e.message}`);
-          reject(error);
+        return false;
+      }).then((restaurant) => {
+        if (restaurant) {
+          // Resolve with data from idb.
+          console.info(`Fetched restaurant ${id}: retreived from idb.`);
+          resolve(restaurant);
+        } else {
+          // If no restaurant is received from idb, we make a request.
+          fetch(`${DBHelper.DATABASE_URL}/${id}`)
+          .then((response) => {
+            if (response.status === 200) {
+              const jsonResponse = response.json();
+              // Received restaurant info, lets store it in idb.
+              openDatabase().then(function(db) {
+                // Again, only if it's possible to open idb.
+                if (!db) return;
+                jsonResponse.then((restaurant) => {
+                  const tx = db.transaction(dbId, 'readwrite');
+                  const store = tx.objectStore(dbId);
+                  store.put(restaurant);
+                });
+              });
+              console.info(`Fetched restaurant ${id}: retreived via fetch.`);
+              resolve(jsonResponse);
+            } else {
+              // Error during fetch.
+              response.text()
+              .then((message) => {
+                reject(message);
+              });
+            }
+          })
+          .catch((e) => {
+            // Error during fetch.
+            const error = (`Request failed. ${e.message}`);
+            reject(error);
+          });
+        }
       });
     });
   }
