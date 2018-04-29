@@ -43,19 +43,44 @@ document.addEventListener('DOMContentLoaded', (event) => {
     // Got an error!
     console.error(error);
   });
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 992 && !self.map) {
+        self.initMap();
+    }
+  });
 });
+
+/**
+ * Show map on small devices (< 992px).
+ */
+showMapModal = () => {
+  const body = document.getElementsByTagName('body')[0];
+  body.classList.add('map-visible');
+  self.initMap(true);
+};
+
+/**
+ * Hide map on small devices (< 992px).
+ */
+hideMapModal = () => {
+  const body = document.getElementsByTagName('body')[0];
+  body.classList.remove('map-visible');
+};
 
 /**
  * Initialize Google map, called from HTML.
  */
-window.initMap = () => {
+window.initMap = (forceRender = false) => {
   if (!self.map && self.restaurant) {
-    self.map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 16,
-      center: self.restaurant.latlng,
-      scrollwheel: false
-    });
-    DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+    if (window.innerWidth >= 992 || forceRender) {
+      self.map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 16,
+        center: self.restaurant.latlng,
+        scrollwheel: false
+      });
+      DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+    }
   }
   mapLoaded = true;
 };

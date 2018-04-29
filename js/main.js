@@ -36,7 +36,30 @@ document.addEventListener('DOMContentLoaded', (event) => {
   fetchNeighborhoods();
   fetchCuisines();
   updateRestaurants();
+
+  window.addEventListener('resize', () => {
+    if (window.innerWidth >= 992 && !self.map) {
+        self.initMap();
+    }
+  });
 });
+
+/**
+ * Show map on small devices (< 992px).
+ */
+showMapModal = () => {
+  const body = document.getElementsByTagName('body')[0];
+  body.classList.add('map-visible');
+  self.initMap(true);
+};
+
+/**
+ * Hide map on small devices (< 992px).
+ */
+hideMapModal = () => {
+  const body = document.getElementsByTagName('body')[0];
+  body.classList.remove('map-visible');
+};
 
 /**
  * Fetch all neighborhoods and set their HTML.
@@ -98,18 +121,20 @@ fillCuisinesHTML = (cuisines = self.cuisines) => {
 /**
  * Initialize Google map, called from HTML.
  */
-window.initMap = () => {
-  let loc = {
-    lat: 40.722216,
-    lng: -73.987501
-  };
-  self.map = new google.maps.Map(document.getElementById('map'), {
-    zoom: 12,
-    center: loc,
-    scrollwheel: false
-  });
-  if (!self.markers.length) {
-    addMarkersToMap();
+window.initMap = (forceRender = false) => {
+  if (window.innerWidth >= 992 || (forceRender && !self.map)) {
+    let loc = {
+      lat: 40.722216,
+      lng: -73.987501
+    };
+    self.map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 12,
+      center: loc,
+      scrollwheel: false
+    });
+    if (!self.markers.length) {
+      addMarkersToMap();
+    }
   }
 };
 

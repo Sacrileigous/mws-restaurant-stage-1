@@ -156,16 +156,54 @@
       /**
       * Map
       */
-      #map-container {
-        flex: 1;
+      @media (min-width: 992px) {
+        #map-container {
+          flex: 1;
+        }
       }
 
       @media (max-width: 991.98px) {
         #map-container {
-          flex-grow: 0;
-          order: 1;
+          flex: 0;
+          display: none;
+        }
+        
+        .map-visible #map-container {
+          display: block;
+        }
+      }
+
+      #map-inner-container {
+        width: 100%;
+        height: 100%;
+      }
+
+      .map-visible {
+        overflow: hidden;
+      }
+
+      @media (max-width: 991.98px) {
+        .map-visible #map-container:before {
+          content: '';
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          background: rgba(51, 51, 51, 0.9);
+          z-index: 4;
+        }
+
+        .map-visible #map-inner-container {
+          position: fixed;
+          z-index: 5;
+          top: 50%;
+          left: 15px;
+          transform: translateY(-50%);
+          width: calc(100% - 30px);
           padding-bottom: 56.25%;
-          position: relative;
+          box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+          height: auto;
         }
       }
 
@@ -179,6 +217,45 @@
         #map {
           position: absolute !important;
           overflow: hidden;
+        }
+      }
+
+      #show-map,
+      #hide-map {
+        display: none;
+      }
+
+      @media (max-width: 991.98px) {
+        #show-map {
+          position: fixed;
+          right: 0;
+          bottom: 100px;
+          min-width: 48px;
+          min-height: 48px;
+          background: #14598A;
+          z-index: 1;
+          border: 0;
+          color: #FFF;
+          box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
+          text-decoration: underline;
+          border-radius: 5px 0 0 5px;
+          display: inline-block;
+        }
+
+        .map-visible #hide-map {
+          position: absolute;
+          top: -68px;
+          right: 0;
+          min-width: 48px;
+          min-height: 48px;
+          background: #14598A;
+          z-index: 1;
+          border: 0;
+          color: #FFF;
+          text-decoration: underline;
+          display: inline-block;
+          padding: 0 20px;
+          box-shadow: 0px 0px 5px 0px rgba(0, 0, 0, 0.75);
         }
       }
 
@@ -477,9 +554,14 @@
         </div>
         <ul id="restaurants-list"></ul>
       </section>
+
       <section id="map-container">
-        <div id="map" role="application"></div>
+        <div id="map-inner-container">
+          <button id="hide-map" ontouchend="hideMapModal()" ontclick="hideMapModal()">Hide map</button>
+          <div id="map" role="application"></div>
+        </div>
       </section>
+      <button id="show-map" ontouchend="showMapModal()" ontclick="showMapModal()"><span class="visually-hidden">Show </span>Map</button>
     </main>
 
     <footer id="footer">
