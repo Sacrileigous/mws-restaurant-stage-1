@@ -464,8 +464,8 @@
 
     <main id="maincontent">
       <section id="list-container">
-        <div class="filter-options">
-          <h2>Filter Results</h2>
+        <div class="filter-options" role="form" aria-labelledby="filter-options-label">
+          <h2 id="filter-options-label">Filter Results</h2>
           <label for="neighborhoods-select" class="visually-hidden">Select neighborhood</label>
           <select id="neighborhoods-select" name="neighborhoods" onchange="updateRestaurants()">
             <option value="all">All Neighborhoods</option>

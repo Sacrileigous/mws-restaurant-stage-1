@@ -1,4 +1,4 @@
-let restaurant, osberver;
+let restaurant, osberver, mapLoaded = false;
 var map;
 
 /**
@@ -29,23 +29,35 @@ if ('IntersectionObserver' in window) {
 }
 
 /**
- * Initialize Google map, called from HTML.
+ * Fetch restaurant as soon as the page is loaded.
  */
-window.initMap = () => {
+document.addEventListener('DOMContentLoaded', (event) => {
   fetchRestaurantFromURL()
   .then((restaurant) => {
-    self.map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 16,
-      center: restaurant.latlng,
-      scrollwheel: false
-    });
     fillBreadcrumb();
-    DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+    if (!self.map && mapLoaded) {
+      self.initMap();
+    }
   })
   .catch((error) => {
     // Got an error!
     console.error(error);
   });
+});
+
+/**
+ * Initialize Google map, called from HTML.
+ */
+window.initMap = () => {
+  if (!self.map && self.restaurant) {
+    self.map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 16,
+      center: self.restaurant.latlng,
+      scrollwheel: false
+    });
+    DBHelper.mapMarkerForRestaurant(self.restaurant, self.map);
+  }
+  mapLoaded = true;
 };
 
 /**
