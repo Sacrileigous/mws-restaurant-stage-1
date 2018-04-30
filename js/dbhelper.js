@@ -280,4 +280,42 @@ class DBHelper {
     });
   }
 
+  /**
+   * Toogle restaurant favourite state.
+   */
+  static toogleRestaurantFavourite(id, state) {
+    return new Promise((resolve, reject) => {
+      fetch(`${DBHelper.DATABASE_URL}/${id}/?is_favorite=${state}`, {
+        method: 'PUT'
+      })
+      .then((response) => {
+        if (response.status === 200) {
+          const jsonResponse = response.json();
+          // Received restaurant info, lets store it in idb.
+          openDatabase().then(function(db) {
+            // Again, only if it's possible to open idb.
+            if (!db) return;
+            jsonResponse.then((restaurant) => {
+              const tx = db.transaction(dbId, 'readwrite');
+              const store = tx.objectStore(dbId);
+              store.put(restaurant);
+            });
+          });
+          resolve(jsonResponse);
+        } else {
+          // Error during fetch.
+          response.text()
+          .then((message) => {
+            reject(message);
+          });
+        }
+      })
+      .catch((e) => {
+        // Error during fetch.
+        const error = (`Request failed. ${e.message}`);
+        reject(error);
+      });
+    });
+  }
+
 }

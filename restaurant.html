@@ -460,6 +460,38 @@
         margin-bottom: 15px;
       }
 
+      #restaurant-header {
+        display: flex;
+        min-height: 48px;
+        padding-right: 48px;
+        position: relative;
+      }
+
+      @media (min-width: 576px) {
+        #restaurant-header {
+          width: 100%;
+        }
+      }
+
+      #restaurant-favourite {
+        font-size: 20pt;
+        min-width: 48px;
+        min-height: 48px;
+        position: absolute;
+        top: 0;
+        right: 0;
+        border: 0;
+        background: none;
+        cursor: pointer;
+        color: #14598A;
+        transition: color .2s;
+        margin-top: 4px;
+      }
+
+      #restaurant-favourite.active {
+        color: orange;
+      }
+
       #restaurant-name {
         color: #14598A;
         font-family: Arial, sans-serif;
@@ -547,7 +579,10 @@
 
         <div id="restaurant-wrapper">
           <section id="restaurant-container">
-            <h2 id="restaurant-name"></h2>
+            <div id="restaurant-header">
+                <h2 id="restaurant-name"></h2>
+                <button id="restaurant-favourite" ontouchend="toogleFavourite()" onclick="toogleFavourite()"><span class="visually-hidden">Mark as favourite</span>&#9733;</button>
+            </div>
 
             <div id="restaurant-details-wrapper">
               <p id="restaurant-address"></p>
@@ -568,11 +603,11 @@
 
       <section id="map-container">
         <div id="map-inner-container">
-          <button id="hide-map" ontouchend="hideMapModal()" ontclick="hideMapModal()">Hide map</button>
+          <button id="hide-map" ontouchend="hideMapModal()" onclick="hideMapModal()">Hide map</button>
           <div id="map" role="application"></div>
         </div>
       </section>
-      <button id="show-map" ontouchend="showMapModal()" ontclick="showMapModal()"><span class="visually-hidden">Show </span>Map</button>
+      <button id="show-map" ontouchend="showMapModal()" onclick="showMapModal()"><span class="visually-hidden">Show </span>Map</button>
     </main>
 
     <footer id="footer">

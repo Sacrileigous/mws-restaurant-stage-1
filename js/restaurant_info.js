@@ -113,7 +113,7 @@ fetchRestaurantFromURL = () => {
 };
 
 /**
- * Create restaurant HTML and add it to the webpage
+ * Create restaurant HTML and add it to the webpage.
  */
 fillRestaurantHTML = (restaurant = self.restaurant) => {
   const name = document.getElementById('restaurant-name');
@@ -142,6 +142,7 @@ fillRestaurantHTML = (restaurant = self.restaurant) => {
   if (restaurant.operating_hours) {
     fillRestaurantHoursHTML();
   }
+  updateFavouriteToggleHTML();
   // fill reviews
   fillReviewsHTML();
 };
@@ -213,13 +214,39 @@ createReviewHTML = (review) => {
 };
 
 /**
- * Add restaurant name to the breadcrumb navigation menu
+ * Add restaurant name to the breadcrumb navigation menu.
  */
-fillBreadcrumb = (restaurant=self.restaurant) => {
+fillBreadcrumb = (restaurant = self.restaurant) => {
   const breadcrumb = document.getElementById('breadcrumb');
   const li = document.createElement('li');
   li.innerHTML = restaurant.name;
   breadcrumb.appendChild(li);
+};
+
+/**
+ * Toggle restaurant favorite state.
+ */
+toogleFavourite = (restaurant = self.restaurant) => {
+  restaurant.is_favorite = restaurant.is_favorite === 'true' ? 'false' : 'true';
+  DBHelper.toogleRestaurantFavourite(restaurant.id, restaurant.is_favorite);
+  updateFavouriteToggleHTML();
+  console.log(restaurant);
+};
+
+/**
+ * Update favourite toogle button html.
+ */
+updateFavouriteToggleHTML = (restaurant = self.restaurant) => {
+  const button = document.getElementById('restaurant-favourite');
+  const text = button.getElementsByClassName('.visually-hidden');
+  console.log(restaurant, restaurant.is_favorite);
+  if (restaurant.is_favorite === 'true') {
+    button.classList.add('active');
+    text.text = 'Unmark as favourite';
+  } else {
+    button.classList.remove('active');
+    text.text = 'Mark as favourite';
+  }
 };
 
 /**
