@@ -1,4 +1,4 @@
-var staticCacheName = 'restaurant-static-v8';
+var staticCacheName = 'restaurant-static-v12';
 
 self.addEventListener('install', function(event) {
   event.waitUntil(
@@ -26,6 +26,10 @@ self.addEventListener('activate', function(event) {
 });
 
 self.addEventListener('fetch', function(event) {
+  if (event.request.method !== 'GET') {
+    return;
+  }
+  
   event.respondWith(
     caches.open(staticCacheName).then(function(cache) {
       return cache.match(event.request.url).then(function(response) {

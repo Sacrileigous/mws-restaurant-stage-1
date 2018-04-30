@@ -33,6 +33,10 @@ if ('IntersectionObserver' in window) {
  * Fetch neighborhoods and cuisines as soon as the page is loaded.
  */
 document.addEventListener('DOMContentLoaded', (event) => {
+  const script = document.createElement('script');
+  script.src = 'https://maps.googleapis.com/maps/api/js?key=AIzaSyClViRpLh2mA3D_Gn5PYcjXsTo2v91ujMs&libraries=places&callback=initMap';
+  document.getElementsByTagName('body')[0].appendChild(script);
+
   fetchNeighborhoods();
   fetchCuisines();
   updateRestaurants();

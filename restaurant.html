@@ -489,7 +489,7 @@
       }
 
       #restaurant-favourite.active {
-        color: orange;
+        color: #AA1B17;
       }
 
       #restaurant-name {
@@ -532,6 +532,12 @@
         text-transform: uppercase;
       }
 
+      #reviews-container {
+        margin-bottom: 40px;
+        padding-bottom: 40px;
+        border-bottom: 1px solid #fff;
+      }
+
       #reviews-container h2 {
         color: #14598A;
         font-size: 20pt;
@@ -561,6 +567,72 @@
       #restaurant-hours td {
         color: #666;
       }
+
+      #add-review-container {
+        margin-bottom: 15px;
+      }
+
+      #add-review-container h2 {
+        color: #14598A;
+        font-size: 20pt;
+        font-weight: 300;
+        letter-spacing: -1px;
+        padding-bottom: 1pt;
+      }
+
+      #add-review label {
+        display: block;
+        font-weight: bold;
+      }
+
+      #add-review {
+        max-width: 480px;
+        margin: 0 auto;
+      }
+
+      .form-control {
+        margin-bottom: 15px;
+      }
+
+      .form-control input,
+      .form-control select,
+      .form-control textarea {
+        border-radius: 5px;
+        padding: 8px 5px;
+        border: 1px solid #ccc;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .form-control input[type="submit"] {
+        display: block;
+        width: auto;
+        padding: 5px 20px;
+        margin: 0 auto;
+        border-radius: 0;
+        font-size: 14pt;
+        background: #14598A;
+        color: #FFF;
+        border: 0;
+        cursor: pointer;
+      }
+
+      #add-review-container .message {
+        font-size: 16pt;
+        text-align: center;
+        background: #ccc;
+        padding: 10px;
+      }
+
+      #add-review-container .message--success {
+        background: #BCE9A9;
+      }
+
+      #add-review-container .message--error {
+        background: #E03935;
+        color: #FFF;
+      }
+      
     </style>
   </head>
 
@@ -598,6 +670,38 @@
           <section id="reviews-container">
             <ul id="reviews-list"></ul>
           </section>
+
+          <section id="add-review-container">
+            <h2>Add review</h2>
+            <form id="add-review" action="http://localhost:1337/reviews/" method="POST">
+              <input type="hidden" name="restaurant_id" id="form-restaurant-id" />
+
+              <div class="form-control">
+                  <label for="form-name">Name</label>
+                  <input type="text" name="name" id="form-name" required />
+              </div>
+
+              <div class="form-control">
+                <label for="form-rating">Rating</label>
+                <select type="text" name="rating" id="form-rating" required >
+                  <option value="1">1</option>
+                  <option value="2">2</option>
+                  <option value="3">3</option>
+                  <option value="4">4</option>
+                  <option value="5">5</option>
+                </select>
+              </div>
+              
+              <div class="form-control">
+                <label for="form-comments">Comments</label>
+                <textarea name="comments" id="form-comments" required rows="5"></textarea>
+              </div>
+
+              <div class="form-control">
+                <input type="submit" value="Submit" id="form-submit" />
+              </div>
+            </form>
+          </section>
         </div>
       </div>
 
@@ -614,10 +718,7 @@
       Copyright (c) 2018 <a href="/"><strong>Restaurant Reviews</strong></a> All Rights Reserved.
     </footer>
 
-    <script type="application/javascript" charset="utf-8" src="vendor/idb/idb.js"></script>
-    <script type="text/javascript" src="js/dbhelper.js"></script>
-    <script type="text/javascript" src="js/restaurant_info.js"></script>
-    <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyClViRpLh2mA3D_Gn5PYcjXsTo2v91ujMs&libraries=places&callback=initMap"></script>
+    <script defer type="text/javascript" src="dist/js/restaurant.js"></script>
   </body>
 
 </html>
